@@ -6,6 +6,8 @@ from sklearn.utils import shuffle
 from collections import defaultdict
 from Cart2Pixel import Cart2Pixel
 from ConvPixel import ConvPixel
+from sklearn.decomposition import PCA
+
 
 def get_matrix(dset, Parm=None):
     if Parm is None:
@@ -14,7 +16,8 @@ def get_matrix(dset, Parm=None):
             'Max_Px_Size': 120,
             'MPS_Fix': 1,
             'ValidRatio': 0.1,
-            'Seed': 108
+            'Seed': 108,
+            'NORM': 1 
         }
 
     YTrain = np.array(dset['train_labels'])
@@ -47,6 +50,21 @@ def get_matrix(dset, Parm=None):
         dset['Xtrain'] = np.nan_to_num(dset['Xtrain'])
         dset['XValidation'] = np.clip(np.nan_to_num(dset['XValidation']), 0, 1)
 
+        Out['ValidationRawdata'] = dset['XValidation'].copy()
+        Out['ValidationLabelsOrdered'] = YValidation.copy()
+        print("Applying PCA dimensionality reduction...")
+
+        X_train_T = dset['Xtrain'].T  
+        pca = PCA(n_components=100) 
+        X_train_reduced = pca.fit_transform(X_train_T) 
+        dset['Xtrain'] = X_train_reduced.T  
+
+        X_val_T = dset['XValidation'].T
+        X_val_reduced = pca.transform(X_val_T)
+        dset['XValidation'] = X_val_reduced.T
+
+        Out['pca'] = pca 
+
     elif Parm.get('NORM') == 2:
         print("\nNORM-2")
         Out['Norm'] = 2
@@ -66,7 +84,7 @@ def get_matrix(dset, Parm=None):
         'Max_Px_Size': Parm['Max_Px_Size']
     }
 
-    Out['ValidationRawdata'] = dset['XValidation']
+    # Out['ValidationRawdata'] = dset['XValidation']
 
     if Parm['MPS_Fix'] == 1:
         Out['M'], Out['xp'], Out['yp'], Out['A'], Out['B'], Out['Base'] = Cart2Pixel(Q, Parm['Max_Px_Size'], Parm['Max_Px_Size'])
@@ -87,6 +105,8 @@ def get_matrix(dset, Parm=None):
     Out['XValidation'] = XValidation
     Out['train_labels'] = YTrain
     Out['Validation_labels'] = YValidation
+    Out['ValidationLabelsOrdered'] = YValidation.copy() 
+    Out['feature_order'] = np.arange(dset['Xtrain'].shape[0]) 
 
     dset['xp'] = Out['xp']
     dset['yp'] = Out['yp']
@@ -95,4 +115,7 @@ def get_matrix(dset, Parm=None):
     dset['Base'] = Out['Base']
     dset['XValidation'] = Out['XValidation']
     dset['Validation_labels'] = Out['Validation_labels']
+    dset['Min'] = Out['Min']
+    dset['Max'] = Out['Max']
+
     return Out

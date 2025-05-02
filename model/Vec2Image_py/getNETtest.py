@@ -37,11 +37,12 @@ class NetTester:
 
         # Load the original test set
         self.Xtest = np.array(dset['Xtest'], dtype=float)  # (n_features, n_samples)
-        lb = dset.get('label_encoder', None)
-
-        if lb:
-            self.Ytest = lb.transform(dset['test_labels'])     # 得到 one-hot 编码
-            self.Ytest = np.argmax(self.Ytest, axis=1)         # 取最大索引变成整数 label
+        # lb = dset.get('label_encoder', None)
+        le = self.dset.get('label_encoder')
+        if le:
+            # self.Ytest = lb.transform(dset['test_labels'])     # 得到 one-hot 编码
+            # self.Ytest = np.argmax(self.Ytest, axis=1)         # 取最大索引变成整数 label
+            self.Ytest = le.transform(self.dset['test_labels'])
         else:
          raise ValueError("Missing LabelBinarizer in dset['label_encoder']")
 
@@ -64,12 +65,16 @@ class NetTester:
             # Norm-1: (X - Min)/(Max - Min), then clip to [0,1]
             print("\nUsing Norm-1 ...")
             # broadcast: (n_features,1)
-            denom = (self.Out['Max'] - self.Out['Min'])
-            denom[denom == 0] = 1e-12  # Avoid division by zero
-            self.Xtest = (self.Xtest - self.Out['Min'][:, None]) / denom[:, None]
-            # Replace NaN -> 0
-            self.Xtest = np.nan_to_num(self.Xtest, nan=0.0)
-            self.Xtest = np.clip(self.Xtest, 0, 1)
+            # self.Xtest = np.array(self.Xtest, dtype=np.float32)
+            # if self.Xtest.ndim != 2:
+            #     self.Xtest = self.Xtest.reshape(self.Xtest.shape[0], -1)
+            # denom = (self.Out['Max'] - self.Out['Min'])
+            # denom[denom == 0] = 1e-12  # Avoid division by zero
+            # # self.Xtest = (self.Xtest - self.Out['Min'][:, None]) / denom[:, None]
+            # self.Xtest = (self.Xtest - self.Out['Min']) / denom
+            # # Replace NaN -> 0
+            # self.Xtest = np.nan_to_num(self.Xtest, nan=0.0)
+            # self.Xtest = np.clip(self.Xtest, 0, 1)
         else:
             # Norm-2: 1) Clamp values below Min to Min; 2) Take log(x + abs(Min)+1);
             #         3) Divide by Max; 4) Clip to [0,1]
@@ -94,6 +99,7 @@ class NetTester:
         for j in range(n_samples):
             # MATLAB: ConvPixel(dset.Xtest(:, j), ...)
             FVec = self.Xtest[:, j].flatten() 
+            FVec = FVec[self.Out['feature_order']]
             image_2d = ConvPixel(FVec, self.xp, self.yp, self.A, self.B, self.Base)
             XTest_np[j, 0, :, :] = image_2d
 

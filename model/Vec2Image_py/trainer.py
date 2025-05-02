@@ -38,17 +38,18 @@ def get_net_trainer(X_train, y_train, X_val, y_val):
                                   torch.tensor(y_train.argmax(axis=1), dtype=torch.long))
     val_dataset = TensorDataset(torch.tensor(X_val, dtype=torch.float32),
                                 torch.tensor(y_val.argmax(axis=1), dtype=torch.long))
-
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    g = torch.Generator()
+    g.manual_seed(42)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, generator=g)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     
-    train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs=30)
+    train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs=20)
 
     return model, train_loader, val_loader, criterion, optimizer, device
 
 
-def train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs=30):
+def train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs=20):
     for epoch in range(epochs):
         model.train()
         total_loss = 0.0

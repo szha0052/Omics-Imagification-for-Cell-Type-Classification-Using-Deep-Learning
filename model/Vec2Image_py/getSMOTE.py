@@ -20,20 +20,26 @@ class SmoteGenerator:
         Perform SMOTE oversampling and return the augmented data and labels.
     """
 
-    def __init__(self, data, labels, k=5):
-        """
-        Parameters
-        ----------
-        data : array-like of shape (n_samples, n_features)
-            Input data.
-        labels : array-like of shape (n_samples,)
-            Input labels.
-        k : int, optional
-            Number of nearest neighbors to consider, default is 5.
-        """
+    # def __init__(self, data, labels, k=5):
+    #     """
+    #     Parameters
+    #     ----------
+    #     data : array-like of shape (n_samples, n_features)
+    #         Input data.
+    #     labels : array-like of shape (n_samples,)
+    #         Input labels.
+    #     k : int, optional
+    #         Number of nearest neighbors to consider, default is 5.
+    #     """
+    #     self.data = np.asarray(data, dtype=float)
+    #     self.labels = np.asarray(labels)
+    #     self.k = k
+
+    def __init__(self, data, labels, k=5, seed=None):
         self.data = np.asarray(data, dtype=float)
         self.labels = np.asarray(labels)
         self.k = k
+        self.seed = seed
 
     def fit_resample(self):
         """
