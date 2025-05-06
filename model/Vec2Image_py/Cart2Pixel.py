@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
-from ConvPixel import ConvPixel
+from .ConvPixel import ConvPixel
 def minboundrect(x, y):
     # Dummy implementation: returns a square around the data
     xmin, xmax = np.min(x), np.max(x)

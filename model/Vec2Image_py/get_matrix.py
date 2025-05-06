@@ -4,8 +4,8 @@ import random
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import shuffle
 from collections import defaultdict
-from Cart2Pixel import Cart2Pixel
-from ConvPixel import ConvPixel
+from .Cart2Pixel import Cart2Pixel
+from .ConvPixel import ConvPixel
 from sklearn.decomposition import PCA
 
 

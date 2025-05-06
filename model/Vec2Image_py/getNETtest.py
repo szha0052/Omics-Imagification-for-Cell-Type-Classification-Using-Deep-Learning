@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from ConvPixel import ConvPixel
+from .ConvPixel import ConvPixel
 from sklearn.preprocessing import LabelBinarizer
 
 class NetTester:

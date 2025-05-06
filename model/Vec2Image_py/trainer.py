@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-from model import Vec2ImageNet
+from .model import Vec2ImageNet
 
 def get_net_trainer(X_train, y_train, X_val, y_val):
     opt_vars = {
